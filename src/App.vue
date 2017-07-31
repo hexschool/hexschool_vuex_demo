@@ -13,17 +13,17 @@
           </li>
         </ul>
         <div class="form-inline mr-3">
-          <select name="" id="" class="form-control" v-model="status">
+          <select name="" id="" class="form-control" @change="changeStatus" v-model="status">
             <option value="線上">線上</option>
             <option value="線下">線下</option>
           </select>
         </div>
         <span class="navbar-text">
-          Hi {{ username }}
+          Hi {{ showUserName }}
         </span>
       </div>
     </nav>
-    <router-view :status="status" @pushNewName="getNewName"></router-view>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -32,8 +32,7 @@ export default {
   name: 'app',
   data () {
     return {
-      status: '線上',
-      username: 'Casper2'
+      status: this.$store.state.status
     }
   },
   methods: {
@@ -41,7 +40,28 @@ export default {
       console.log(newName)
       let vm = this
       vm.username = newName
+    },
+    getData () {
+      let vm = this
+      vm.$http.get('https://randomuser.me/api/?results=25').then(response => {
+        console.log(response.body.results)
+        // vm.$store.state.listData = response.body.results
+        vm.$store.commit('UPDATE_DATA', response.body.results)
+      }, response => {
+      })
+    },
+    changeStatus (e) {
+      this.$store.state.status = this.status
     }
+  },
+  computed: {
+    showUserName () {
+      return this.$store.state.username
+    }
+  },
+  mounted () {
+    let vm = this
+    vm.getData()
   }
 }
 </script>
